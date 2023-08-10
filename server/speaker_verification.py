@@ -10,7 +10,7 @@ sample_list = {}
 sr = 16000
 similarity = torch.nn.CosineSimilarity(dim=-1, eps=1e-6)
 
-# load all sample audio into a list of tensors for later comparison
+# load all sample audio into a list of tensor embeddings for later comparison
 def load_samples():
     global sample_list
     sample_dir = './speaker_voice_sample/'
@@ -37,10 +37,6 @@ def compare_recording(audio_tensor):
     scores = {}
     for sample_name, sample_audio_emb in sample_list.items():
         # get the score for speaker verification and put it in pair with the speaker sample name
-        #print("real-time tensor:")
-        #print(audio_tensor_unsqueeze)
-        #print("sample tensor:")
-        #print(sample_audio)
         scores[sample_name] = similarity(rt_audio_emb, sample_audio_emb)
     # Find the maximum value in the dictionary
     print("comparison scores:")

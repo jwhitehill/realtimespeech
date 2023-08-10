@@ -24,7 +24,7 @@ def receive_data(client_socket):
     print("number of bytes from client:")
     print(L)
     data = b""
-    #receive one by one:
+    #receive by 16000 bytes:
     while len(data) < L:
         if L-len(data) < 16000:
             chunk = client_socket.recv(L-len(data))
@@ -33,45 +33,6 @@ def receive_data(client_socket):
         if not chunk:
             break
         data += chunk
-
-    # receive all at once:
-    #chunk = client_socket.recv(L)
-    #data += chunk
-    
-    # receive different size chunks
-    #if L < 16000:
-    #    chunk = client_socket.recv(L)
-    #    data += chunk
-    #else:
-    #    loop = int(L / 16000)
-    #    print("the number of loop is:")
-    #    print(loop)
-    #    for i in range (loop):
-    #        chunk = client_socket.recv(16000)
-    #        if not chunk:
-    #            break
-    #        data += chunk
-    #print(len(data))
-    
-    #pdb.set_trace()
-
-    # Receive complete chunks of 16000 bytes
-    #while L >= 200:
-    #    chunk = client_socket.recv(200)
-    #    print(len(chunk))
-    #    if not chunk:
-    #        break
-    #    data += chunk
-    #    L -= 200
-
-    # Receive any remaining bytes
-    #while L > 0:
-    #    chunk = client_socket.recv(L)
-    #    if not chunk:
-     #       break
-     #   data += chunk
-     #   L -= len(chunk)
-    #print("the value of L at the end is: ", L)
     print("Received data length:", len(data))
 
     return data
@@ -86,7 +47,6 @@ def decode_numpy(data):
     received_array = np.frombuffer(data, dtype="float64")
     if received_array.size > 0:
         received_array = received_array.reshape((-1,))  # Convert back to the original shape
-        #print(received_array)
         return received_array
     
 # send the response message back to client
@@ -111,7 +71,6 @@ def receive_info(server_socket):
         numpy_data = receive_data(client_socket)
         numpy = decode_numpy(numpy_data)
         print("Got sample numpy data")
-        #print(numpy)
         path_data = receive_data(client_socket)
         path = decode_string(path_data)
         print(path)
