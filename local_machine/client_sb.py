@@ -1,33 +1,17 @@
-# client to connect to linux server with speechbrain installed
+# client_sb.py creates client to connect to linux server with speechbrain installed
 import socket
-import numpy as np
 from datetime import datetime
 
 server_address = "127.0.0.1" # Localhost
 server_port = 12345 # Port used by the server
 
-# Receive the data in chunks
-def receive_data(client_socket):
-    # get message length
-    L = int.from_bytes(client_socket.recv(4), byteorder='big')  
-    data = b""
-    while len(data) < L:
-        chunk = client_socket.recv(4096)
-        if not chunk:
-            break
-        data += chunk
-    return data
-
-# Convert the received bytes back to a string using utf-8 decoding
-def decode_string(data):
-    message = data.decode('utf-8')
-    return message
-
+# Open the socket to connect to server
 def open_socket():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((server_address, server_port))
     return client_socket
 
+# Close the socket connected to server
 def close_socket(client_socket):
     client_socket.close()
 
@@ -47,40 +31,7 @@ def send_string(client_socket, message):
         print("Error occurred while sending string.")
         print(e)
 
-# receive a string from server
-def receive_string(client_socket):
-    # client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-    try:
-        # client_socket.connect((server_address, server_port))
-
-        # Receive the integer response from the server
-        response_data = receive_data(client_socket)
-        response = decode_string(response_data)
-        print("Received response from the server:", response)
-
-    except Exception as e:
-        print("Error occurred while receiving string.")
-        print(e)
-
-    # client_socket.close()
-    return response
-
-# send a numpy array to server and get the response back from server
-# def send_nparray(client_socket, array):
-#     # Serialize the NumPy array using numpy.tobytes
-#     serialized_array = array.tobytes()
-    
-#     try:
-#         print("sending numpy array")
-#         client_socket.sendall(len(serialized_array).to_bytes(4, byteorder='big'))
-#         client_socket.sendall(serialized_array)
-#         print("NumPy array sent successfully.")
-
-#     except Exception as e:
-#         print("Error occurred while sending data.")
-#         print(e)
-
+# send a numpy array to server
 def send_nparray(client_socket, array):
     # Serialize the NumPy array using numpy.tobytes
     serialized_array = array.tobytes()
@@ -90,7 +41,8 @@ def send_nparray(client_socket, array):
         print("Sending NumPy array")
         client_socket.sendall(total_bytes.to_bytes(4, byteorder='big'))
 
-        chunk_size = 8000
+        # send numpy array by chunks of 16000
+        chunk_size = 16000
         offset = 0
 
         while offset < total_bytes:
@@ -104,6 +56,37 @@ def send_nparray(client_socket, array):
         print("Error occurred while sending data.")
         print(e)
 
+# Receive the data in chunks
+def receive_data(client_socket):
+    # get message length
+    L = int.from_bytes(client_socket.recv(4), byteorder='big')  
+    data = b""
+    # Receives data from server
+    while len(data) < L:
+        chunk = client_socket.recv(4096)
+        if not chunk:
+            break
+        data += chunk
+    return data
+
+# Convert the received bytes back to a string using utf-8 decoding
+def decode_string(data):
+    message = data.decode('utf-8')
+    return message
+
+# receive a string from server
+def receive_string(client_socket):
+    try:
+        # Receive the integer response from the server
+        response_data = receive_data(client_socket)
+        response = decode_string(response_data)
+        print("Received response from the server:", response)
+
+    except Exception as e:
+        print("Error occurred while receiving string.")
+        print(e)
+
+    return response
 
 # process the enrollment command
 def enroll_process(path, nparray):

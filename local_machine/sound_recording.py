@@ -1,10 +1,7 @@
-# this file manages both sample audio recording and real-time sound-to-tensor conversion
-# interface for communication between local and linux machine
+# sound_recording.py manages sample audio recording and serves as the interface for communication between local and server machine
 import sounddevice as sd
-import soundfile as sf
 import threading
 import client_sb
-import numpy as np
 
 # duration of recording
 duration = 2
@@ -33,10 +30,6 @@ def audio_to_numpy(duration):
     recording = sd.rec(int(duration * sample_rate), samplerate=sample_rate, channels=channels, dtype='float64')
     sd.wait()  # Wait for recording to finish
     return recording
-
-# def start_communication():
-#     client_socket = client_sb.open_socket()
-#     return client_socket
 
 # connect to server and pass the 1 sec recording for processing
 # return: name of the speaker

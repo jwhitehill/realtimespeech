@@ -1,3 +1,4 @@
+# user_interface.py creates the UI and send commands to sound_recording.py for sample enrollment and speaker recognition
 import tkinter as tk
 import time
 import threading
@@ -9,7 +10,7 @@ root.title('Speaker Recognition')
 
 countdown_time = 5
 
-# show the 5 second countdown of sample recording
+# show the 5 second countdown during sample recording
 def countdown_display(countdown_lb):
     global countdown_time
     countdown_lb.config(text=countdown_time)
@@ -17,7 +18,7 @@ def countdown_display(countdown_lb):
     if countdown_time >= 0:
         root.after(1000, countdown_display, countdown_lb)
 
-# record the sample audio and save it to the sample directory
+# record the sample audio and save it to the sample directory in server
 def save_sample(entry):
     name = entry.get()
     sound_recording.record_sample(5, "./speaker_voice_sample/"+name)
@@ -29,14 +30,9 @@ def save_and_countdown(entry, countdown_lb):
     threading.Thread(target=countdown_display, args=(countdown_lb,)).start()
     save_sample(entry)
 
-
 # call enrollment page
 def enrollment_page():
     enrollment_frame = tk.Frame(main_frame)
-
-    # # for testing
-    # lb = tk.Label(enrollment_frame, text = 'enrollment frame', font=('Bold', 30))
-    # lb.pack()
 
     enroll_entry = tk.Entry(main_frame)
     enroll_entry.pack(expand=True, anchor="center")
@@ -44,24 +40,24 @@ def enrollment_page():
     countdown_lb = tk.Label(enrollment_frame, text = countdown_time, font=('Bold', 15))
     countdown_lb.pack(expand=True, anchor="center")
 
+    # button for recording sample audio
     enroll_btn = tk.Button(enrollment_frame, text='Enroll', font=('Bold', 15),
                             fg='#158aff', bd=0,
                             command=lambda:save_and_countdown(enroll_entry, countdown_lb))
-    # enroll_btn.place(relx=0.5, rely=0.5, anchor="center")
     enroll_btn.pack(expand=True, anchor="center")
     
     enrollment_frame.pack(pady=20)
     
-# update the name label for who the speaker is
+# update the name label for who the identified speaker is
 def update_name(name_lb):
     sound_recording.load_samples()
     time.sleep(1)
-    #client_socket = sound_recording.start_communication()
     while(True):
         audio_np = sound_recording.audio_to_numpy(1)
         name = sound_recording.verify_speaker(audio_np)
         name_lb.config(text=name)
 
+# start a new thread for updating the name label
 def update_name_threading(name_lb):
     threading.Thread(target=update_name, args=(name_lb,)).start()
 
@@ -69,12 +65,10 @@ def update_name_threading(name_lb):
 def recognition_page():
     recognition_frame = tk.Frame(main_frame)
 
-    # lb = tk.Label(recognition_frame, text = 'recognition frame', font=('Bold', 30))
-    # lb.pack()
-
     name_lb = tk.Label(recognition_frame, text = 'name', font=('Bold', 20))
     name_lb.pack(expand=True, anchor="center")
 
+    # button to start the speaker identification process
     start_rec_btn = tk.Button(recognition_frame, text="Start Recognition",  font=('Bold', 15),
                              fg='#158aff', bd=0,
                              command=lambda:update_name_threading(name_lb))
@@ -82,6 +76,7 @@ def recognition_page():
 
     recognition_frame.pack(pady=20)
 
+# page switching
 def hide_page():
     for frame in main_frame.winfo_children():
         frame.destroy()
