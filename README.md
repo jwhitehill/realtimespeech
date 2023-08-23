@@ -3,12 +3,12 @@ This program serves as a speaker recognition software that can identify whether 
 How to use it:
 
 0. install the following packages on the client side:
-    pip install socket
-    pip install sounddevice
+   	pip install socket
+   	pip install sounddevice
 
   install PyTorch and the following packages on the server side:
-    pip install speechbrain
-    pip install socket
+  	pip install speechbrain
+   	pip install socket
 
 1. To set up server connection, follow these steps:
     1. Use regular ssh to connect to the Linux box. 
