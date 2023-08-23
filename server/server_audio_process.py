@@ -2,12 +2,10 @@
 import speechbrain
 import socket
 import numpy as np
-import soundfile as sf
 #import speaker_verification
 import vad_speaker_verification
 import torch
-import speaker_verification
-import pdb
+# import speaker_verification
 from datetime import datetime
 
 # placeholder for temporary numpy array (voice sample)
