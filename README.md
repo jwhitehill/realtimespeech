@@ -1,6 +1,7 @@
 This program serves as a speaker recognition software that can identify whether someone is speaking and the current speaker in run-time. 
 
 How to use it:
+
 0. install the following packages on the client side:
     pip install socket
     pip install sounddevice
