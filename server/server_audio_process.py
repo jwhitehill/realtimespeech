@@ -1,8 +1,10 @@
+# server_audio_process.py receives messages from the client and connect to vad_speaker_verification.py for identificatin
 import speechbrain
 import socket
 import numpy as np
 import soundfile as sf
-import speaker_verification
+#import speaker_verification
+import vad_speaker_verification
 import torch
 import speaker_verification
 import pdb
@@ -24,7 +26,7 @@ def receive_data(client_socket):
     print("number of bytes from client:")
     print(L)
     data = b""
-    #receive by 16000 bytes:
+    # receive by 16000 bytes (sample rate)
     while len(data) < L:
         if L-len(data) < 16000:
             chunk = client_socket.recv(L-len(data))
@@ -33,8 +35,8 @@ def receive_data(client_socket):
         if not chunk:
             break
         data += chunk
-    print("Received data length:", len(data))
 
+    print("Received data length:", len(data))
     return data
 
 # Convert the received bytes back to a string using utf-8 decoding
@@ -47,6 +49,7 @@ def decode_numpy(data):
     received_array = np.frombuffer(data, dtype="float64")
     if received_array.size > 0:
         received_array = received_array.reshape((-1,))  # Convert back to the original shape
+        #print(received_array)
         return received_array
     
 # send the response message back to client
@@ -71,6 +74,7 @@ def receive_info(server_socket):
         numpy_data = receive_data(client_socket)
         numpy = decode_numpy(numpy_data)
         print("Got sample numpy data")
+        #print(numpy)
         path_data = receive_data(client_socket)
         path = decode_string(path_data)
         print(path)
@@ -79,7 +83,7 @@ def receive_info(server_socket):
     elif command == "load_samples":
         print("Got load sample command")
         global sample_list
-        sample_list = speaker_verification.load_samples()
+        sample_list = vad_speaker_verification.load_samples()
         response_message(client_socket, "sample loading successful")
     elif command == "recognize":
         print("Got recognize command")
@@ -96,7 +100,7 @@ def receive_info(server_socket):
         print("Current time to end receiving numpy array:", current_time)
         
         audio_tensor = torch.from_numpy(numpy)
-        name = speaker_verification.compare_recording(audio_tensor)
+        name = vad_speaker_verification.compare_recording(audio_tensor)
         response_message(client_socket, name)
 
         # Get the current datetime with milliseconds
