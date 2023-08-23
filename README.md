@@ -11,12 +11,11 @@ How to use it:
    	pip install socket
 
 1. To set up server connection, follow these steps:
-    1. Use regular ssh to connect to the Linux box. 
+    1. Use regular ssh to connect to the Linux box: 
 	    ssh zdai2@130.215.182.227
-    2. Activate conda, and then run "python server.py"
+    2. Activate conda, and then run "python server.py": 
 	    conda activate speechbrain
-	    python3 server.py
-    3. On Windows terminal, use "ssh -L..." to open a SSH tunnel
+    3. On Windows terminal, use "ssh -L..." to open a SSH tunnel: 
 	    ssh -L 12345:localhost:12345 zdai2@130.215.182.227 -N
 
 2. To start the program, run user_interface.py
